@@ -5,6 +5,7 @@
     <ignored path="Final_Project.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -341,11 +342,23 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1437684369652</updated>
+<<<<<<< Updated upstream
     </task>
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
+=======
+      <workItem from="1469662327802" duration="119000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="119000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-13" y="-13" width="2586" height="1554" extended-state="6" />
+>>>>>>> Stashed changes
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
