@@ -26,9 +26,18 @@ public class FileSystem {
 
     void sync( ) {
     }
+
     boolean format( int files ) {
+
+        int inodeBlocksRequired = files / SuperBlock.inodesPerBlock;
+        if (files % SuperBlock.inodesPerBlock != 0) {
+            inodeBlocksRequired += 1;
+        }
+
+        superblock.format(inodeBlocksRequired);
         return true;
     }
+
     FileTableEntry open( String filename, String mode ) {
         return null;
     }
