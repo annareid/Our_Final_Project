@@ -28,7 +28,7 @@ class SuperBlock {
         }
     }
 
-    public void format(int inodeBlocks)
+    public void format(int inodeBlocks) // formats the disk, creates superblock & specified # of inodes
     {
         totalInodes = inodeBlocks * inodesPerBlock;
         freeList = 1 + inodeBlocks; // start at 1 because the superblock occupies block 0
@@ -56,7 +56,7 @@ class SuperBlock {
     //Dequeues the top block from the free list
     // getFreeBlock()
 
-    //Enqueue a given block to the end of the fee list
+    //Enqueue a given block to the end of the free list
     //returnBlock(int blockNumber)
 
 
