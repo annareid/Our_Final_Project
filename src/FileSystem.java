@@ -18,8 +18,8 @@ public class FileSystem {
         int dirSize = fsize( dirEnt );
         if ( dirSize > 0 ) {
             byte[] dirData = new byte[dirSize];
-            read( dirEnt, dirData );
-            directory.bytes2directory( dirData );
+            read( dirEnt, dirData );               //read from a file to dirData[]
+            directory.bytes2directory( dirData );   //write dirData[] to the directory
         }
         close( dirEnt );
     }
@@ -65,16 +65,20 @@ public class FileSystem {
         if(whence < 1){											//If whence is SEEK_SET (= 0), the file's seek pointer is set to offset bytes
             ftEnt.seekPtr = 0 + offset;                         // from the beginning of the file
         }else if(whence == 1){									//If whence is SEEK_CUR (= 1), the file's seek pointer is set to
-            ftEnt.seekPtr = ftEnt.seekPtr += offset;            //its current value plus the offset. The offset can be positive or negative.
+            ftEnt.seekPtr += offset;                            //its current value plus the offset. The offset can be positive or negative.
         }else if(whence == 2){									//If whence is SEEK_END (= 2), the file's seek pointer is set to the size of the
             ftEnt.seekPtr = ftEnt.inode.length + offset;        //file plus the offset. The offset can be positive or negative.
         }else{													//Set the pointer to the end of the file if whence is greater than 2.
             ftEnt.seekPtr = ftEnt.inode.length;
         }
-        if (ftEnt.seekPtr > ftEnt.inode.length)                 //If the pointer is beyond the file size, set seek pointer to the end of the ifle
+
+        if (ftEnt.seekPtr > ftEnt.inode.length) {                 //If the pointer is beyond the file size, set seek pointer to the end of the ifle
             ftEnt.seekPtr = ftEnt.inode.length;
-        if (ftEnt.seekPtr < 0)                                  //If the seek pointer is set to a negative number, it must clamp it to 0.
+        }
+
+        if (ftEnt.seekPtr < 0) {                                 //If the seek pointer is set to a negative number, it must clamp it to 0.
             ftEnt.seekPtr = 0;
+        }
 
         return ftEnt.seekPtr;
     }
