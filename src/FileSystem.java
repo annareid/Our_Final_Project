@@ -49,9 +49,9 @@ public class FileSystem {
     //file.
     public synchronized int close( FileTableEntry ftEnt ) {
 
-        fte.count--;
-        if (fte.count == 0)
-            filetable.ffree(fte);		//unregisters from fd table of the calling thread's TCB
+        ftEnt.count--;
+        if (ftEnt.count == 0)
+            filetable.ffree(ftEnt);		//unregisters from fd table of the calling thread's TCB
         return 0;                       //Returns 0 in success
     }
 
