@@ -25,6 +25,11 @@ public class FileSystem {
     }
 
     void sync( ) {
+        FileTableEntry ft = open("/", "w");     //It opens the root directory
+        byte[] buf = dir.directory2bytes();     //As processing, convert the directory to bytes
+        write(ft, buf);                         //Write the data to the disk
+        close(ft);                              //Close root
+        superblock.sync();                      //Call superBlock to continue the sync
     }
 
     boolean format( int files ) {
@@ -38,13 +43,18 @@ public class FileSystem {
         return true;
     }
 
-    FileTableEntry open( String filename, String mode ) {
-        return null;
+    FileTableEntry open( String filename, String mode ) {return null;}
+
+    //Close the file corresponding to fd, commits all file transactions on this
+    //file.
+    public synchronized int close( FileTableEntry ftEnt ) {
+
+        fte.count--;
+        if (fte.count == 0)
+            filetable.ffree(fte);		//unregisters from fd table of the calling thread's TCB
+        return 0;                       //Returns 0 in success
     }
 
-    boolean close( FileTableEntry ftEnt ) {
-        return true;
-    }
     int fsize( FileTableEntry ftEnt ) {
         return 0;
     }

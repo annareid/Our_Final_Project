@@ -31,7 +31,21 @@ public class FileTable {
         // free this file table entry.
         // return true if this file table entry found in my table
 
-        return true;
+        if(table.removeElement(e))
+        {
+
+            e.inode.flag = 0;                //set flag to indicate removed entry
+            if(e.inode.count != 0)
+                e.inode.count--;                 //Decrement count
+            e.inode.toDisk(e.iNumber);     // save the corresponding inode to the disk
+            e = null;
+
+            notify();                      //wakes up the threads waiting on this slot
+
+            return true;
+        }
+
+        return false;
     }
 
 

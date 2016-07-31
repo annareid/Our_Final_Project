@@ -51,8 +51,16 @@ class SuperBlock {
 
     // Writes back totalBlocks, inodeBlocks, and freeList to disk
     // sync()
+    void sync()
+    {
+        byte[] block = new byte[512];                    //Created a buffer
+        SysLib.int2bytes(totalBlocks, block, 0);        //Load total blocks into the buffer as bytes
+        SysLib.int2bytes(totalInodes, block, 4);        //Load total Inodes into buffer as bytes
+        SysLib.int2bytes(freeList, block, 8);           //Load freelist into buffer as bytes
 
+        SysLib.rawwrite(0, block);                      //Write buffer to disk
 
+    }
     //Dequeues the top block from the free list
     // getFreeBlock()
 
