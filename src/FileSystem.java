@@ -24,12 +24,14 @@ public class FileSystem {
         close( dirEnt );
     }
 
+
     void sync( ) {
-        FileTableEntry ft = open("/", "w");     //It opens the root directory
+   /*     FileTableEntry ft = open("/", "w");     //It opens the root directory
         byte[] buf = directory.directory2bytes();     //As processing, convert the directory to bytes
         write(ft, buf);                         //Write the data to the disk
         close(ft);                              //Close root
         superblock.sync();                      //Call superBlock to continue the sync
+        */
     }
 
     boolean format( int files ) {
@@ -47,13 +49,17 @@ public class FileSystem {
 
     //Close the file corresponding to fd, commits all file transactions on this
     //file.
-    public synchronized boolean close( FileTableEntry ftEnt ) {
 
+   public synchronized boolean close( FileTableEntry ftEnt ) {
+/*
         ftEnt.count--;
         if (ftEnt.count == 0)
-            filetable.ffree(ftEnt);		//unregisters from fd table of the calling thread's TCB
+            filetable.ffree(ftEnt);		    //unregisters from fd table of the calling thread's TCB
+       */
         return true;                       //Returns 0 in success
+
     }
+
 
     int fsize( FileTableEntry ftEnt ) {
         return 0;
