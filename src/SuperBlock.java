@@ -1,6 +1,4 @@
 
-import java.util.ArrayList;
-
 class SuperBlock {
     public static final int inodesPerBlock = 16;
     private final int defaultInodeBlocks = 64;

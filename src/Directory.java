@@ -1,6 +1,4 @@
-/**
- * Created by Michael on 7/23/2015.
- */
+
 public class Directory {
     private static int maxChars = 30; // max characters of each file name
 

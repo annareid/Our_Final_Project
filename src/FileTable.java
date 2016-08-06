@@ -35,11 +35,11 @@ public class FileTable {
         {
             e.inode.flag = 0;                //set flag to indicate removed entry
             if(e.inode.count != 0)
-                e.inode.count--;            //Decrement count
-            e.inode.toDisk(e.iNumber);     // save the corresponding inode to the disk
+                e.inode.count--;             //Decrement count
+            e.inode.toDisk(e.iNumber);       // save the corresponding inode to the disk
             e = null;
 
-            notify();                      //wakes up the threads waiting on this slot
+            notify();                       //wakes up the threads waiting on this slot
             return true;
         }
 
@@ -48,6 +48,6 @@ public class FileTable {
 
 
     public synchronized boolean fempty( ) {
-        return table.isEmpty( );  // return if table is empty
-    }                            // should be called before starting a format
+        return table.isEmpty( );            // return if table is empty
+    }                                       // should be called before starting a format
 }
