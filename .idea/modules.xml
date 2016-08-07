@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< Updated upstream
       <module fileurl="file://$PROJECT_DIR$/Final_Project.iml" filepath="$PROJECT_DIR$/Final_Project.iml" />
-=======
-      <module fileurl="file:$PROJECT_DIR$/../../../..////Mac/Home/Documents/Our_Final_Project/Final_Project.iml" filepath="Mac/..////Mac/Home/Documents/Our_Final_Project/Final_Project.iml" />
-      <module fileurl="file:$PROJECT_DIR$/../../../..//$PROJECT_DIR$/.idea/Our_Final_Project.iml" filepath="$PROJECT_DIR$/.idea/Our_Final_Project.iml" />
-      <module fileurl="file:$PROJECT_DIR$/../../../..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" filepath="Mac/..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" />
-      <module fileurl="file:$PROJECT_DIR$/../../../..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" filepath="Mac/..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" />
-      <module fileurl="file:$PROJECT_DIR$/../../../..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" filepath="Mac/..////Mac/Home/Documents/Our_Final_Project/.idea/Our_Final_Project.iml" />
->>>>>>> Stashed changes
     </modules>
   </component>
 </project>
