@@ -56,7 +56,6 @@ class SuperBlock {
         }
         SysLib.int2bytes(-1, freeListPointer, 0);
         SysLib.rawwrite(freeBlock, freeListPointer);
-        SysLib.sync();
     }
 
     // Writes back totalBlocks, inodeBlocks, and freeList to disk
@@ -68,11 +67,11 @@ class SuperBlock {
         SysLib.int2bytes(freeList, block, 8);           //Load freelist into buffer as bytes
 
         SysLib.rawwrite(0, block);                      //Write buffer to disk
-
+        SysLib.sync();
     }
 
     //Dequeues the top block from the free list
-    public int getFreeBlock(){
+    public short getFreeBlock(){
         int freeBlock = freeList;                       //freeBlock number
         int nextFreeBlock;                              //pointer ot the next free block
 
@@ -82,8 +81,7 @@ class SuperBlock {
 
         freeList = nextFreeBlock;                       //update the freeList pointer
 
-        sync();
-        return freeBlock;
+        return (short)freeBlock;
     }
 
     //Enqueue a given block to the end of the free list

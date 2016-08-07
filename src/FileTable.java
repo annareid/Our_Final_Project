@@ -12,7 +12,6 @@ public class FileTable {
         dir = directory;           // receive a reference to the Director
     }                             // from the file system
 
-
     // major public methods
      public synchronized FileTableEntry falloc( String filename, String mode ) {
         // allocate a new file (structure) table entry for this file name
@@ -20,9 +19,23 @@ public class FileTable {
         // increment this inode's count
         // immediately write back this inode to the disk
         // return a reference to this file (structure) table entry
+         short inodeNumber = dir.namei(filename);
+         if (inodeNumber < 0) {
+             inodeNumber = dir.ialloc(filename);
+         }
 
-    return null;
+         if (inodeNumber < 0) {
+             return null;
+         }
 
+         Inode inode = new Inode(inodeNumber);
+         inode.flag = 1;
+         inode.count++;
+         inode.toDisk(inodeNumber);
+
+         FileTableEntry entry = new FileTableEntry(inode, inodeNumber, mode);
+         table.add(entry);
+         return entry;
     }
 
     public synchronized boolean ffree( FileTableEntry e ) {

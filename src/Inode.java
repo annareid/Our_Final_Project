@@ -48,11 +48,9 @@ public class Inode {
         }
         SysLib.short2bytes(indirect, inodeBytes, 30);
 
-
         byte[] blockBytes = new byte[Disk.blockSize];
         int block = getBlock(iNumber);
         SysLib.rawread(block, blockBytes);
-
 
         int byteOffset = getByteOffsetInBlock(iNumber);          //get the offset
         for (int i = 0; i < inodeBytes.length; ++i) {
@@ -73,4 +71,26 @@ public class Inode {
         return iNumber % SuperBlock.inodesPerBlock * iNodeSize;
     }
 
+    public short getDataBlock( int byteOffsetInFile ) {
+        int blockOffset = byteOffsetInFile / Disk.blockSize;
+        if (blockOffset < this.direct.length) {
+            return this.direct[blockOffset];
+        }
+
+        if (this.indirect < 0) {
+            return this.indirect;
+        }
+
+        byte[] indirectPointersBlock = new byte[Disk.blockSize];
+        SysLib.rawread(this.indirect, indirectPointersBlock);
+
+        final int sizeOfPointer = 2;
+        short[] indirectPointers = new short[Disk.blockSize / sizeOfPointer];
+        for (int i = 0; i < indirectPointers.length; ++i) {
+            indirectPointers[i] = SysLib.bytes2short(indirectPointersBlock, i * sizeOfPointer);
+        }
+
+        blockOffset = blockOffset - this.direct.length;
+        return indirectPointers[blockOffset];
+    }
 }
