@@ -45,7 +45,7 @@ public class FileSystem {
         return true;
     }
 
-    FileTableEntry open( String filename, String mode ) {return null;}
+    FileTableEntry open( String filename, String mode ) {return null;} //Anna
 
     //Close the file corresponding to fd, commits all file transactions on this
     //file.
@@ -63,19 +63,19 @@ public class FileSystem {
 
     int fsize( FileTableEntry ftEnt ) {
         return 0;
-    }
+    } //paria
     int read( FileTableEntry ftEnt, byte[] buffer ) {
         return 0;
-    }
+    } //paria
     int write( FileTableEntry ftEnt, byte[] buffer ) {
         return 0;
-    }
+    } //Anna
     private boolean deallocAllBlocks( FileTableEntry ftEnt ) {
         return true;
-    }
+    } //Anna
     boolean delete( String filename ) {
         return true;
-    }
+    } // Paria
 
     public synchronized int seek( FileTableEntry ftEnt, int offset, int whence ) {
         if(whence < 1){											//If whence is SEEK_SET (= 0), the file's seek pointer is set to offset bytes
