@@ -64,10 +64,26 @@ public class FileSystem {
     //======================CLOSE=============================
     //Close the file corresponding to fd, commits all file transactions on this
     //file.
-   public synchronized boolean close( FileTableEntry ftEnt ) {
-       return this.filetable.ffree(ftEnt);
-    }
+   public synchronized boolean close( FileTableEntry fte ) {
+       Inode iNode;
 
+       if (fte == null)
+           return false;
+
+       synchronized (fte) {
+           if ((iNode = fte.inode) == null)
+               return false;
+           if (iNode.flag == Inode.DELETE && fte.count == 0) {
+               // deallocate file table entry if no more threads are using the
+               // file and it has been marked as deleted.
+               if (!directory.ifree(fte.iNumber))
+                   return false;
+           }
+           if (!filetable.ffree(fte))
+               return false;
+       }
+       return true;
+    }
     //======================CLOSE=============================
 
 
@@ -201,7 +217,6 @@ public class FileSystem {
     {
         return ftEnt.inode.length;
     }
-
     //======================FSIZE=============================
 
     //======================DELETE=============================
@@ -210,10 +225,10 @@ public class FileSystem {
         if (filename == "")                                // if blank file name, return false
             return false;
 
-        if ((iNumber = directory.namei(filename)) == -1) // get the iNumber for this filename
-            return false;                               // if it does not exist, return false
+        if ((iNumber = directory.namei(filename)) == -1)  // get the iNumber for this filename
+            return false;                                 // if it does not exist, return false
 
-        return directory.ifree((short)iNumber);             // deallocate file, return success or failure
+        return directory.ifree((short)iNumber);           // deallocate file, return success or failure
     }
     //======================DELETE=============================
 
