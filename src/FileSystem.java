@@ -24,7 +24,7 @@ public class FileSystem {
         close( dirEnt );
     }
 
-
+    //======================SYNC===============================
     void sync( ) {
         /*
         FileTableEntry ft = open("/", "w");        // It opens the root directory
@@ -34,7 +34,9 @@ public class FileSystem {
         superblock.sync();                         // Call superBlock to continue the sync
         */
     }
+    //======================SYNC===============================
 
+    //======================FORMAT=============================
     boolean format( int files ) {
 
         int inodeBlocksRequired = files / SuperBlock.inodesPerBlock;
@@ -46,6 +48,9 @@ public class FileSystem {
         return true;
     }
 
+    //======================FORMAT=============================
+
+    //======================OPEN===============================
     FileTableEntry open( String filename, String mode ) {
         if (mode == "r" && this.directory.namei(filename) < 0) {
             return null;
@@ -53,21 +58,20 @@ public class FileSystem {
 
         return this.filetable.falloc(filename, mode);
     } //Anna
+    //======================OPEN===============================
 
+
+    //======================CLOSE=============================
     //Close the file corresponding to fd, commits all file transactions on this
     //file.
    public synchronized boolean close( FileTableEntry ftEnt ) {
        return this.filetable.ffree(ftEnt);
     }
 
-    int fsize( FileTableEntry ftEnt ) {
-        return 0;
-    } //paria
+    //======================CLOSE=============================
 
-    int read( FileTableEntry ftEnt, byte[] buffer ) {
-        return 0;
-    } //paria
 
+    //======================WRITE=============================
     int write( FileTableEntry ftEnt, byte[] buffer ) {
         if (buffer.length == 0) {
             return 0;
@@ -100,14 +104,7 @@ public class FileSystem {
         return offsetInBuffer;
     } //Anna
 
-    private boolean deallocAllBlocks( FileTableEntry ftEnt ) {
-        return true;
-    } //Anna
-
-    boolean delete( String filename ) {
-        return true;
-    } // Paria
-
+    //======================WRITE=============================
     public synchronized int seek( FileTableEntry ftEnt, int offset, int whence ) {
         if(whence < 1){											//If whence is SEEK_SET (= 0), the file's seek pointer is set to offset bytes
             ftEnt.seekPtr = 0 + offset;                         // from the beginning of the file
@@ -129,7 +126,9 @@ public class FileSystem {
 
         return ftEnt.seekPtr;
     }
+    //======================WRITE=============================
 
+    //======================allocateNewDataBlock==============
     private short allocateNewDataBlock(FileTableEntry fileTableEntry) {
         // Check if new data block can be referenced by direct pointers.
         for (int i = 0; i < fileTableEntry.inode.direct.length; ++i) {
@@ -189,11 +188,58 @@ public class FileSystem {
 
         return -4;
     }
+    //======================allocateNewDataBlock==============
 
+    //======================writeEmptyBlock===================
     private void writeEmptyBlock(short blockNumber) {
         byte[] blockBytes = new byte[Disk.blockSize];
         SysLib.rawwrite(blockNumber, blockBytes);
     }
+
+    //======================FSIZE=============================
+    public int fsize( FileTableEntry ftEnt )
+    {
+        return ftEnt.inode.length;
+    }
+
+    //======================FSIZE=============================
+
+    //======================DELETE=============================
+    public boolean delete( String filename ) {
+        int iNumber;
+        if (filename == "")                                // if blank file name, return false
+            return false;
+
+        if ((iNumber = directory.namei(filename)) == -1) // get the iNumber for this filename
+            return false;                               // if it does not exist, return false
+
+        return directory.ifree((short)iNumber);             // deallocate file, return success or failure
+    }
+    //======================DELETE=============================
+
+    //======================READ=============================
+    int read( FileTableEntry ftEnt, byte[] buffer ) {
+        synchronized(ftEnt.inode) {									//Synchronize the read block
+            int bufptr = 0;
+            // while buffer isn't full or seek pointer hasn't reached end of file
+            while (bufptr != buffer.length && ftEnt.seekPtr != ftEnt.inode.length) {    //Continue as long as bufptr doesn't reach buffer's length OR the pointer doesn't reach the inode's length
+                byte[] inBlk = new byte[512];					                        //Create an array for the inBlocks
+                int offset = ftEnt.seekPtr % Disk.blockSize;		                    //mod the pointer to the block
+                int readLength = Math.min(Disk.blockSize-offset, buffer.length - bufptr);//get the minimum of the blocksize - offset/buffer length - offset.
+                int curBlk = ftEnt.inode.findTargetBlock(ftEnt.seekPtr);                 //Whichever min hits first is the condition to compare to
+                SysLib.rawread(curBlk, inBlk);					                        //Find target block and then read it from the disk
+                System.arraycopy(inBlk, offset, buffer, bufptr, readLength);            //Copy the part read into the buffer
+                bufptr += readLength;							                        //Keep incrementing the readlength accordingly
+                ftEnt.seekPtr+= readLength;						                      	//Adjust the pointer accordingly
+            }
+            return bufptr;										                         //Return a pointer to the number read
+        }
+    } //paria
+    //======================READ=============================
+
+    private boolean deallocAllBlocks( FileTableEntry ftEnt ) {
+        return true;
+    } //Anna
 
     private final int SEEK_SET = 0;
     private final int SEEK_CUR = 1;
