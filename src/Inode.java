@@ -2,6 +2,7 @@
 public class Inode {
     private final static int iNodeSize = 32;                    // fix to 32 bytes
     private final static int directSize = 11;                   // # direct pointers
+    public final static short DELETE = 1;
 
     public int length;                                          // file size in bytes
     public short count;                                         // # file-table entries pointing to this
@@ -93,4 +94,27 @@ public class Inode {
         blockOffset = blockOffset - this.direct.length;
         return indirectPointers[blockOffset];
     }
+
+    public int findTargetBlock(int seekptr){						//Used to find a target block
+        if (seekptr > length)									//If the seeker is greater or equal to length, return false
+            return -1;
+        int ptr = seekptr/Disk.blockSize;
+        if (ptr < 11)												//If the seek pointer is within the 11 direct pointers
+            return direct[ptr];									//return back the direct pointer
+        else {
+            ptr -= 11;											//If the pointer isn't less than 11, it's an indirect
+            short[] ptrs = getIndirectBlock();					//create a place for the pointers and call getIndirectBlock
+            return ptrs[ptr];										//return the pointer
+        }
+    }
+    private short[] getIndirectBlock() {							//Used to get the location within the indirect block
+        byte[] data = new byte[Disk.blockSize];					//Create the buffer
+        SysLib.rawread(indirect, data);							//Read the indirect data from the disk
+        short[] ptrs = new short[Disk.blockSize/2];				//create an array of pointers
+        for (int i = 0; i < data.length; i+=2) {					//Load the pointers
+            ptrs[i/2] = SysLib.bytes2short(data, i);
+        }
+        return ptrs;
+    }
+
 }
