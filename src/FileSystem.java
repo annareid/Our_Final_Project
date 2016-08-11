@@ -25,15 +25,7 @@ public class FileSystem {
     }
 
     //======================SYNC===============================
-    void sync( ) {
-        /*
-        FileTableEntry ft = open("/", "w");        // It opens the root directory
-        byte[] buf = directory.directory2bytes();  // As processing, convert the directory to bytes
-        write(ft, buf);                            // Write the data to the disk
-        close(ft);                                 // Close root
-        superblock.sync();                         // Call superBlock to continue the sync
-        */
-    }
+    void sync( ) { }
     //======================SYNC===============================
 
     //======================FORMAT=============================
@@ -108,19 +100,24 @@ public class FileSystem {
             SysLib.rawread(blockNumber, blockBytes);
 
             int offsetInBlock = ftEnt.seekPtr % Disk.blockSize;
-            int bytesToWriteInBlock = Math.min(buffer.length, Disk.blockSize - offsetInBlock);
+            int bytesToWriteInBlock = Math.min(buffer.length - offsetInBuffer, Disk.blockSize - offsetInBlock);
             for (int i = 0; i < bytesToWriteInBlock; ++i) {
                 blockBytes[i + offsetInBlock] = buffer[offsetInBuffer++];
             }
             SysLib.rawwrite(blockNumber, blockBytes);
+
             ftEnt.seekPtr += bytesToWriteInBlock;
+            if (ftEnt.seekPtr > ftEnt.inode.length) {
+                ftEnt.inode.length = ftEnt.seekPtr;
+            }
         }
 
         SysLib.sync();
         return offsetInBuffer;
     } //Anna
-
     //======================WRITE=============================
+
+    //======================SEEK=============================
     public synchronized int seek( FileTableEntry ftEnt, int offset, int whence ) {
         if(whence < 1){											//If whence is SEEK_SET (= 0), the file's seek pointer is set to offset bytes
             ftEnt.seekPtr = 0 + offset;                         // from the beginning of the file
@@ -142,7 +139,7 @@ public class FileSystem {
 
         return ftEnt.seekPtr;
     }
-    //======================WRITE=============================
+    //======================SEEK=============================
 
     //======================allocateNewDataBlock==============
     private short allocateNewDataBlock(FileTableEntry fileTableEntry) {
@@ -162,29 +159,40 @@ public class FileSystem {
             }
         }
 
-        // Check if indirect block of pointers has been created.
+        final int sizeOfPointer = 2;
+        byte[] indirectPointerBlockBytes = new byte[Disk.blockSize];
+        short[] indirectPointers = new short[Disk.blockSize / sizeOfPointer];
         if (fileTableEntry.inode.indirect < 0) {
+            // Indirect block of pointers doesn't exist, create it.
             short indirectPointerBlock = this.superblock.getFreeBlock();
             if (indirectPointerBlock < 0) {
                 return -2;
             }
 
-            writeEmptyBlock(indirectPointerBlock);
-
+            // Set indirect block.
             fileTableEntry.inode.indirect = indirectPointerBlock;
+
+            // Initialize indirect block.
+            for (int i = 0; i < indirectPointers.length; ++i) {
+                indirectPointers[i] = -1;
+            }
+
+            // Write initialized indirect block back to disk.
+            for (int j = 0; j < indirectPointers.length; ++j) {
+                SysLib.short2bytes(indirectPointers[j], indirectPointerBlockBytes, j * sizeOfPointer);
+            }
+            SysLib.rawwrite(fileTableEntry.inode.indirect, indirectPointerBlockBytes);
             fileTableEntry.inode.toDisk(fileTableEntry.iNumber);
         }
-
-        // Create new block in indirect block of pointers.
-        byte[] indirectPointerBlockBytes = new byte[Disk.blockSize];
-        SysLib.rawread(fileTableEntry.inode.indirect, indirectPointerBlockBytes);
-
-        final int sizeOfPointer = 2;
-        short[] indirectPointers = new short[Disk.blockSize / sizeOfPointer];
-        for (int i = 0; i < indirectPointers.length; ++i) {
-            indirectPointers[i] = SysLib.bytes2short(indirectPointerBlockBytes, i * sizeOfPointer);
+        else {
+            // Indirect block of pointers exists, read it.
+            SysLib.rawread(fileTableEntry.inode.indirect, indirectPointerBlockBytes);
+            for (int i = 0; i < indirectPointers.length; ++i) {
+                indirectPointers[i] = SysLib.bytes2short(indirectPointerBlockBytes, i * sizeOfPointer);
+            }
         }
 
+        // Create new data block referenced by indirect pointer
         for (int i = 0; i < indirectPointers.length; ++i) {
             if (indirectPointers[i] < 0) {
                 short block = this.superblock.getFreeBlock();
@@ -192,7 +200,10 @@ public class FileSystem {
                     return -3;
                 }
 
+                // Set data block.
                 indirectPointers[i] = block;
+
+                // Write updated indirect block back to disk.
                 for (int j = 0; j < indirectPointers.length; ++j) {
                     SysLib.short2bytes(indirectPointers[j], indirectPointerBlockBytes, j * sizeOfPointer);
                 }
