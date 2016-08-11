@@ -81,12 +81,12 @@ public class FileSystem {
 
     //======================WRITE=============================
     int write( FileTableEntry ftEnt, byte[] buffer ) {
-        if (buffer.length == 0) {
+        if (buffer.length == 0) {                                                   //Return 0 if the buffer is empty
             return 0;
         }
 
         int offsetInBuffer = 0;
-        while (offsetInBuffer != buffer.length) {
+        while (offsetInBuffer != buffer.length) {                                   //Loop until get to the end of the buffer
             short blockNumber = ftEnt.inode.getDataBlock(ftEnt.seekPtr);
             if (blockNumber < 0) {
                 blockNumber = allocateNewDataBlock(ftEnt);
@@ -103,7 +103,7 @@ public class FileSystem {
             for (int i = 0; i < bytesToWriteInBlock; ++i) {
                 blockBytes[i + offsetInBlock] = buffer[offsetInBuffer++];
             }
-            SysLib.rawwrite(blockNumber, blockBytes);
+            SysLib.rawwrite(blockNumber, blockBytes);                               //Write the block on the disk
 
             ftEnt.seekPtr += bytesToWriteInBlock;
             if (ftEnt.seekPtr > ftEnt.inode.length) {
@@ -111,7 +111,7 @@ public class FileSystem {
             }
         }
 
-        return offsetInBuffer;
+        return offsetInBuffer;                                                      //Return the number of bytes written
     } //Anna
     //======================WRITE=============================
 
