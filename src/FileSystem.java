@@ -91,7 +91,6 @@ public class FileSystem {
             if (blockNumber < 0) {
                 blockNumber = allocateNewDataBlock(ftEnt);
                 if (blockNumber < 0) {
-                    SysLib.sync();
                     return offsetInBuffer;
                 }
             }
@@ -112,7 +111,6 @@ public class FileSystem {
             }
         }
 
-        SysLib.sync();
         return offsetInBuffer;
     } //Anna
     //======================WRITE=============================
