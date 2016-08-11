@@ -74,7 +74,7 @@ public class Inode {
 
     public short getDataBlock( int byteOffsetInFile ) {
         int blockOffset = byteOffsetInFile / Disk.blockSize;
-        if (blockOffset < this.direct.length) {
+        if (blockOffset < this.direct.length) {                         //
             return this.direct[blockOffset];
         }
 
